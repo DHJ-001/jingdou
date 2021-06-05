@@ -36,41 +36,29 @@ function png_click(num, pngbase64, showsth){
             let pos = findImage(img, temp1);
             if(pos){return click(pos.x, pos.y);} else sleep(1000);}
         return toastLog(showsth);}
-//6.app启动检测
-var AppRunning = function (){
-    this.start = function (appName) {
-        let thread = threads.start(function() {
-            while(true) {
-                if(currentPackage()!=getPackageName(appName)){
-                    launch(getPackageName(appName))
-                    sleep(1500)}
-                sleep(500)}})
-        return thread},
-    this.stop = function (task){task.interrupt()}}
+
 
 
 //业务函数
 //启动并进入任务列表
 function getinto_task(){
-    var appRunning = new AppRunning()
-    var task = appRunning.start("京东")//启动检测
     toastLog('启动京东中');
-    sleep(5000);
-    appRunning.stop(task)//结束检测
-    wait_sth(text('领京豆').findOne(5000), '已进入京东首页', '找不到领京豆');
-    up_click(textContains('领京豆').findOne(1000));
-    png_click(5, taskinbase64, "未找到升级赚京豆");}
+    sleep(1000);
+    app.startActivity({
+        packageName: "com.jingdong.app.mall",
+        data: 'openapp.jdmobile://virtual?params={"category":"jump","des":"m","url":"https://h5.m.jd.com/rn/42yjy8na6pFsq1cx9MJQ5aTgu3kX/index.html?has_native=0&source=waitou"}'});
+    sleep(2000);
+    png_click(5, taskinbase64, "未找到升级赚京豆");
+}
 
 //检查是否处于任务列表 否则一直返回
 function check_intolist(){
-  while(1){
-    sleep(2000);
-    if(textMatches('去完成|已完成').findOne(3000)) {toastLog('任务列表中');break}
-        else {toastLog('进入任务列表失败\n 尝试返回');check_error(); sleep(1000);}}}
-
-function check_error() {
-    if(text('领京豆').findOne(2000)) getinto_task();
-        else back();}
+    let nums = 3;
+    while(nums--){
+        if(textMatches('去完成|已完成').findOne(3000)) return toastLog('chua~进列表');
+            else {toastLog('进入任务列表失败\n 尝试返回');getinto_task(); sleep(1000);}}
+    toastLog('3次尝试失败 脚本结束');exit();
+        }
 
 //点击xx项目的'去完成'按钮
 function just_doit(matchtext, failshow){
@@ -80,19 +68,20 @@ function just_doit(matchtext, failshow){
 
 //环节：猜你喜欢的商品 
 function cai_ni_xihuan(){
-  while(1){sleep(2000);
-    if(textContains('猜你喜欢的商品(20/20)').exists()) {zhongjie_caini = 0;return false;};
-    if (!boundsInside(0, 0, dev_width, dev_hight/2).textStartsWith('猜你喜欢的商品').exists()) return false;
-        else {just_doit('猜你喜欢的商品', '点击<猜你喜欢的商品>失败');sleep(7000);back();}}}
+  toastLog('进入“猜你”循环');
+  while(1){sleep(1000);
+    if(textContains('猜你喜欢的商品(20/20)').exists()) {zhongjie_caini = 0;toastLog ("猜你喜欢任务已完成");return false;}
+        else {just_doit('猜你喜欢的商品', '点击<猜你喜欢的商品>失败');sleep(6000);back();check_intolist();}}}
 
 //其它环节 单纯点击去完成
 function click_QWC(){
-    if(text('去完成').findOne(3000)) {position_click(text('去完成').findOne(1));
-    sleep(2000); back();}}
+    let qwc = text('去完成').findOne(3000);
+    if(qwc) {position_click(qwc);sleep(2000); back();}}
 
 //全都完成
 function check_noQWC(){
-    if(text('去完成').findOne(3000)) return 1;else {toastLog('任务全部完成！ 脚本结束');exit();}}
+    let nqwc = text('去完成').findOne(3000);
+    if(!nqwc) {toastLog('任务全部完成！ 脚本结束');exit();}}
 
 
 zhongjie_caini = 1;   
@@ -100,8 +89,8 @@ getinto_task();
 check_intolist();
 
 while(1){
-    if(zhongjie_caini) {cai_ni_xihuan();check_intolist();};
+    if(zhongjie_caini && textContains('猜你喜欢的商品').boundsInside(0, 0, dev_width, dev_hight / 1.5).findOne(2000)) 
+        cai_ni_xihuan();
     click_QWC();
   	check_intolist();
-    check_noQWC();
-}
+    check_noQWC();}
