@@ -1,4 +1,6 @@
 # 京豆儿
+不同版本放在branch里
+
 主更新平台：https://hamibot.com/marketplace/WMiFH
 ## 功能
 **自动进入京东 完成京豆人儿任务**
