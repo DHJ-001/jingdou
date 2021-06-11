@@ -11,7 +11,8 @@ if(!requestScreenCapture()){
 //1.点击控件 找不到报错
 function sureclick(x) {if(x) return x.click();else toastLog('未找到按钮');}
 //2.点击不可点击的控件
-function position_click(x){if(x) click(x.bounds().centerX(), x.bounds().centerY());}
+function position_click(x){if(x) click(x.bounds().centerX(), x.bounds().centerY())
+                          		else toastLog('找不到此控件');}
 
 //3.等待某某出现 n秒后作出反馈
 function wait_sth(sth, showsth, nshowsth){
@@ -66,14 +67,16 @@ function cai_ni_xihuan(){
 //其它环节 单纯点击去完成
 function others_task(){
   	sleep(2000);
-    let qwc = text('去完成').findOne(3000);
-  	let no_others_ui = text('已完成').findOne(100);
+    let qwc = text('去完成').findOne(300);
+  	let no_others_ui = text('已完成').findOne(300);
+ 		sleep(2000);
   	//会有四种组合 
-		if(qwc) {position_click(qwc);sleep(2000);back();} //(去完成1+已完成1)+（去完成1+已完成0）
-  		else if(!qwc && no_others_ui) {toastLog('任务全部完成！ 脚本结束');exit();} //去完成0+已完成1
-  			else check_where();
+		if(qwc) {position_click(qwc);sleep(3000);back();}//(去完成1+已完成1)+（去完成1+已完成0）
+  	if(!qwc && no_others_ui) {toastLog('任务全部完成！ 脚本结束');exit();};//去完成0+已完成1
+  	sleep(2000);
+  	check_where();
 }
-
+toastLog('本脚本能够自动修复意外情况');
 let zhongjie_caini = 1;   
 getinto_task();
 
